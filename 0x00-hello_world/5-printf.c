@@ -1,6 +1,7 @@
 #include <stdio.h>
-/*
+/**
 * main - using printf("%s",s)
+* Return: 0
 */
 
 int main(void)
