@@ -10,7 +10,7 @@ int ch2 = 49;
 int ch3 = 50;
 for (ch1 = 48 ; ch1 < 58 ; ch1++)
 {
-for (ch2 = ch1 +1 ; ch2 < 58; ch2++)
+for (ch2 = ch1 + 1 ; ch2 < 58; ch2++)
 {
 for (ch3 = ch2 + 1 ; ch3 < 58; ch3++)
 {
