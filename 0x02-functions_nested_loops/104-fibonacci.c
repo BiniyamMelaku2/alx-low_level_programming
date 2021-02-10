@@ -13,7 +13,7 @@ int counter;
 prev = 1;
 next = 2;
 counter = 1;
-while (counter< 98)
+while (counter < 98)
 {
 printf("%0.f, ", prev);
 temp = prev + next;
