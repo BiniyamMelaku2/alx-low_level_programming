@@ -21,6 +21,6 @@ prev = next;
 next = temp;
 counter++;
 }
-printf("%li\n", next);
+printf("%li\n", prev);
 return (0);
 }
