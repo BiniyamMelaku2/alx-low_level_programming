@@ -8,19 +8,19 @@
 
 int main(void)
 {
-long prev, next, temp;
+long double prev, next, temp;
 int counter;
 prev = 1;
 next = 2;
 counter = 1;
-while (counter< 85)
+while (counter< 98)
 {
-printf("%li, ", prev);
+printf("%0.Lf, ", prev);
 temp = prev + next;
 prev = next;
 next = temp;
 counter++;
 }
-printf("%li\n", prev);
+printf("%0.Lf\n", prev);
 return (0);
 }
