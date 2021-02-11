@@ -30,9 +30,7 @@ div *= 10;
 for (start = count ; start > 1; start--)
 {
 div /= 10;
-
 _putchar(num / div + '0');
-
 num -= (num / div) *div;
 }
 _putchar(n % 10 + '0');
