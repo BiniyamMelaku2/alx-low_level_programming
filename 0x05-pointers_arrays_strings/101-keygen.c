@@ -29,6 +29,6 @@ count++;
 randm = 2772 - sum;
 password[count] = randm;
 
-printf("%s", password);
+printf("%s\n", password);
 return (0);
 }
