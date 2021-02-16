@@ -11,14 +11,24 @@ int main(void)
 {
 int randm, count, sum;
 
-srand(time(NULL));
+char alphnum[63] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+char password[100];
 
-for (count = 0; sum = 2772, sum > 122; count++)
+srand(time(NULL));
+sum = 0;
+count = 0;
+
+while (sum < (2772 - 122))
 {
-randm = (rand() % 125) + 1;
-printf("%c", randm);
-sum -= randm;
+randm = rand() % 62;
+password[count] = alphnum[randm];
+sum += password[count];
+count++;
 }
-printf("%c", sum);
+
+randm = 2772 - sum;
+password[count] = randm;
+
+printf("%s", password);
 return (0);
 }
