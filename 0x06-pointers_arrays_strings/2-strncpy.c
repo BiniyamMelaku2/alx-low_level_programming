@@ -29,6 +29,8 @@ while (count++ < 90)
 }
 break;
 }
+if (*src == '\0')
+*ptr = *src;
 }
 
 return (dest);
