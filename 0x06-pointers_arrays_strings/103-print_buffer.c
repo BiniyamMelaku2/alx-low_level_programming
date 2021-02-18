@@ -22,7 +22,7 @@ for (i = 0; i < limit; i++)
 if (count++ % 10 == 0)
 printf("%08x: ", i);
 if (i < size)
-printf("%02x: ", *(b + i));
+printf("%02x", *(b + i));
 else
 printf("  ");
 if (i % 2 != 0)
