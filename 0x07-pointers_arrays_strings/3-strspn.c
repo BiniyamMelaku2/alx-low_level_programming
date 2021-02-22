@@ -9,7 +9,7 @@
 
 unsigned int _strspn(char *s, char *accept)
 {
-unsigned int count = 1, len_string, i;
+unsigned int len_string, i, max = 0;
 char *ptr = s;
 char *subsg = accept;
 for (len_string = 0; *s++ != '\0'; len_string++)
@@ -20,11 +20,14 @@ for (i = 0; i < len_string; i++)
 {
 if (*subsg == ptr[i])
 {
-count++;
+if (i > max)
+{
+max = i + 1;
+}
 break;
 }
 }
 subsg++;
 }
-return (count);
+return (max);
 }
