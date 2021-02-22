@@ -9,25 +9,22 @@
 
 unsigned int _strspn(char *s, char *accept)
 {
-unsigned int len_string, i, max = 0;
-char *ptr = s;
-char *subsg = accept;
-for (len_string = 0; *s++ != '\0'; len_string++)
-;
-while (*subsg != '\0')
+unsigned int len, i = 0;
+
+while (s[i] != '\0')
 {
-for (i = 0; i < len_string; i++)
+for (len = 0; accept[len]; len++)
 {
-if (*subsg == ptr[i])
+if (s[i] == accept[len])
 {
-if (i > max)
-{
-max = i + 1;
-}
 break;
 }
 }
-subsg++;
+if (s[i] != accept[len])
+{
+break;
 }
-return (max);
+i++;
+}
+return (i);
 }
