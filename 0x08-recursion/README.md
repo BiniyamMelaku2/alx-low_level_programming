@@ -4,18 +4,21 @@
 
 ## 0-puts_recursion.c 
 * a function that prints a string, followed by a new line.
+  FYI: The standard library provides a similar function: puts. Run man puts to learn more.
 
 ## 1-print_rev_recursion.c 
 * a function that prints a string in reverse.
 
 ## 2-strlen_recursion.c
 * a function that returns the length of a string.
+  FYI: The standard library provides a similar function: strlen. Run man strlen to learn more.
 
 ## 3-factorial.c
 * a function that returns the factorial of a given number.
 
 ## 4-pow_recursion.c 
 * a function that returns the value of x raised to the power of y.
+  FYI: The standard library provides a different function: pow. Run man pow to learn more.
 
 ## 5-sqrt_recursion.c
 * a function that returns the natural square root of a number.
