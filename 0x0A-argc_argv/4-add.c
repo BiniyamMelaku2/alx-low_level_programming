@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 int c, num = 0;
 if (argc == 1)
 {
-printf("0\n");
+printf("%d\n", 0);
 return (0);
 }
 
@@ -27,7 +27,7 @@ return (1);
 }
 }
 
-for (c = 0; c < argc; c++)
+for (c = 1; c < argc; c++)
 {
 num += atoi(argv[c]);
 }
