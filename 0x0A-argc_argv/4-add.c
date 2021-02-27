@@ -14,20 +14,20 @@ int main(int argc, char *argv[])
 int c, num = 0;
 if (argc == 1)
 {
-printf("%d\n", 0);
+printf("0\n");
 return (0);
 }
 
 for (c = 1; c < argc; c++)
 {
-if (!atoi(argv[c]) || atoi(argv[c]) < 0)
+if (!atoi(argv[c]))
 {
 printf("Error\n");
 return (1);
 }
 }
 
-for (c = 1; c < argc; c++)
+for (c = 0; c < argc; c++)
 {
 num += atoi(argv[c]);
 }
