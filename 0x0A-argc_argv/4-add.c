@@ -20,6 +20,8 @@ return (0);
 
 for (c = 1; c < argc; c++)
 {
+if (*(argv[c]) == '0')
+continue;
 if (!atoi(argv[c]))
 {
 printf("Error\n");
