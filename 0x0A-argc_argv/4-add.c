@@ -27,7 +27,7 @@ return (1);
 }
 }
 
-for (c = 0; c < argc; c++)
+for (c = 1; c < argc; c++)
 {
 num += atoi(argv[c]);
 }
