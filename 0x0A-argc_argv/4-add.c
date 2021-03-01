@@ -12,6 +12,7 @@
 int main(int argc, char *argv[])
 {
 int c, num = 0;
+char *ptr;
 
 for (c = 1; c < argc; c++)
 {
@@ -24,6 +25,18 @@ if (!atoi(argv[c]))
 printf("Error\n");
 return (1);
 }
+
+strtol(argv[c], &ptr, 10);
+while (*ptr)
+{
+if (*ptr < '0' || *ptr > '9')
+{
+printf("Error\n");
+return (1);
+}
+ptr++;
+}
+
 }
 
 for (c = 1; c < argc; c++)
