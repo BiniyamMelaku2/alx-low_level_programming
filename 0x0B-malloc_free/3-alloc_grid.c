@@ -16,18 +16,23 @@ int i, j;
 if (width <= 0 || height <= 0)
 return (NULL);
 
-arr2d = malloc(height * sizeof(int));
-
-if (arr2d)
+arr2d = (int **)malloc(height * sizeof(int *));
+if (arr2d == NULL)
 {
-for (i = 0; i < width; i++)
-{
-arr2d[i] = malloc(sizeof(int) * width);
-}
-}
-
-if (*arr2d == NULL)
+free(arr2d);
 return (NULL);
+}
+
+for (i = 0; i < height; i++)
+{
+*(arr2d + i) = (int *)malloc(sizeof(int) * width);
+if (*(arr2d + i) == NULL)
+{
+for (j = 0; j < i; j++)
+free(*(arr2d + j));
+free(arr2d);
+}
+}
 
 for (i = 0; i < height; i++)
 {
