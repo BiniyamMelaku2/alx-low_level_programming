@@ -14,6 +14,8 @@ char *ptr;
 unsigned int index = 0, lens1 = 0, lens2 = 0;
 if (s1 == NULL)
 ptr = "";
+if (s2 == NULL)
+s2 = "";
 for (lens1 = 0 ; s1[lens1]; lens1++)
 ;
 for (lens2 = 0 ; s2[lens2]; lens2++)
