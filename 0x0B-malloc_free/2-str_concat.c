@@ -20,7 +20,7 @@ for (lens1 = 0 ; s1[lens1]; lens1++)
 ;
 for (lens2 = 0 ; s2[lens2]; lens2++)
 ;
-ptr = malloc(sizeof(char) * (lens1 + lens2));
+ptr = malloc(sizeof(char) * (lens1 + lens2) + 1);
 if (ptr == NULL)
 return (NULL);
 while (*s1)
