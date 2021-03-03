@@ -20,7 +20,7 @@ else
 {
 for (lenstr = 0 ; str[lenstr]; lenstr++)
 ;
-ptr = malloc(sizeof(char) * lenstr);
+ptr = malloc(sizeof(char) * lenstr + 1);
 if (ptr == NULL)
 {
 return (NULL);
