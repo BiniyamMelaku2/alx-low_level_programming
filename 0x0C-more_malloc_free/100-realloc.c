@@ -16,10 +16,15 @@ unsigned int ct = 0;
 char *newptr;
 char *oldptr = ptr;
 if (ptr == NULL)
+{
 newptr = malloc(new_size);
+return (newptr);
+}
 else if (new_size == old_size)
+{
 return (ptr);
-else if (new_size == 0 && ptr != NULL)
+}
+else if (new_size == 0)
 {
 free(ptr);
 return (NULL);
@@ -31,5 +36,5 @@ for (ct = 0; ct <= old_size; ct++)
 newptr[ct] = oldptr[ct];
 }
 free(ptr);
-return ((void *)newptr);
+return (newptr);
 }
