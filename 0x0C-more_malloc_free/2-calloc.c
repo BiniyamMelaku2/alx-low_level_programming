@@ -13,15 +13,25 @@ void *_calloc(unsigned int nmemb, unsigned int size)
 {
 unsigned int ct;
 char *ptr;
-ptr = malloc(sizeof(size) * nmemb * size);
 
 if (nmemb == 0 || size == 0)
+{
 return (NULL);
+}
+else
+{
+ptr = malloc(nmemb * size);
 if (ptr == NULL)
+{
 return (NULL);
-
-for (ct = 0; ct < (sizeof(size) * nmemb * size); ct++)
-ptr[ct] = 0;
-
-return ((void *)ptr);
+}
+else
+{
+for (ct = 0; ct < (nmemb * size); ct++)
+{
+*(ptr + ct) = 0;
+}
+}
+}
+return (ptr);
 }
