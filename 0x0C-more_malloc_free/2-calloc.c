@@ -23,6 +23,6 @@ return (NULL);
 
 for (ct = 0; ct < (nmemb * size); ct++)
 ptr[ct] = 0;
-ptr[ct] = '\0';
+
 return (ptr);
 }
