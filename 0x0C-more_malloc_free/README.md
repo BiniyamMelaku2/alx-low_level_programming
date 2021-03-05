@@ -25,4 +25,4 @@ If malloc fails, then _calloc returns NULL. FYI: The standard library provides a
  
 ## 101-mul.c
     *  a program that multiplies two positive infinite numbers in string form.
-    > gcc -Wall -pedantic -Werror -Wextra 101-mul.c _putchar.c -o mul
+   > gcc -Wall -pedantic -Werror -Wextra 101-mul.c _putchar.c -o mul
