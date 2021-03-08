@@ -1,13 +1,13 @@
 #ifndef MACRO_STRUCT_DOG_H
 #define MACRO_STRUCT_DOG_H
-#include "dog.h"
+
 /**
  * struct dog - struct type definition
  * @name: name type char member
  * @age: age type float member
  * @owner: owner type char member
  */
-typedef struct dog
+struct dog
 {
 char *name;
 float age;
