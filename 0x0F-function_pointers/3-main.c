@@ -11,9 +11,9 @@
 
 int main(int argc, char *argv[])
 {
+int (*fptr)(int, int);
 if (argc != 4)
 return (0);
-int (*fptr)(int, int);
 fptr = get_op_func(argv[2]);
 if (!get_op_func(argv[2]))
 {
