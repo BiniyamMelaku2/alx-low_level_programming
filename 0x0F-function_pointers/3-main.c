@@ -23,7 +23,7 @@ if (!get_op_func(argv[2]))
 printf("Error\n");
 exit(99);
 }
-if ((get_op_func(argv[2]) == op_div 
+if ((get_op_func(argv[2]) == op_div
 || get_op_func(argv[2]) == op_mod) && atoi(argv[3]) == 0)
 {
 printf("Error\n");
