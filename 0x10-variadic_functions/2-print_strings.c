@@ -10,17 +10,23 @@ va_list valist;
 unsigned int c;
 char *strptr;
 va_start(valist, n);
-for (c = 0; c < n; c++)
+for (c = 0; c < n - 1; c++)
 {
 strptr = va_arg(valist, char*);
-if (strptr == NULL)
-{
+if (strptr == NULL && separator == NULL)
 printf("(nil)");
-}
+else if (strptr == NULL && separator != NULL)
+printf("(nil)%s", separator);
+else if (strptr != NULL && separator == NULL)
 printf("%s", strptr);
-if ((c < n - 1) && separator != NULL)
-printf("%s", separator);
+else if (strptr != NULL && separator != NULL)
+printf("%s%s", strptr, separator);
 }
-printf("\n");
+strptr = va_arg(valist, char*);
+if (strptr != NULL)
+printf("%s", strptr);
+else if (strptr == NULL)
+printf("(nil)");
 va_end(valist);
+printf("\n");
 }
