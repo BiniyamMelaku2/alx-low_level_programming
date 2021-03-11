@@ -1,8 +1,10 @@
 #include "variadic_functions.h"
-void print_char(va_list valst);
-void print_int(va_list valst);
-void print_float(va_list valst);
-void print_string(va_list valst);
+#include <stdio.h>
+#include <stdarg.h>
+void print_char(va_list va_arg_lst);
+void print_int(va_list va_arg_lst);
+void print_float(va_list va_arg_lst);
+void print_string(va_list va_arg_lst);
 /**
  * print_all -  prints anything
  * @format: list of types of arguments
@@ -41,38 +43,40 @@ va_end(valist);
 }
 /**
  * print_char - prints char value
- * @valst: - value to be printed
+ * @va_arg_lst: - value to be printed
  */
-void print_char(va_list valst)
+void print_char(va_list va_arg_lst)
 {
-printf("%c", va_arg(valst, int));
+printf("%c", va_arg(va_arg_lst, int));
 }
 /**
  * print_int - prints int value
- * @valst: - value to be printed
+ * @va_arg_lst: - value to be printed
  */
-void print_int(va_list valst)
+void print_int(va_list va_arg_lst)
 {
-printf("%d", va_arg(valst, int));
+printf("%d", va_arg(va_arg_lst, int));
 }
 /**
  * print_float - prints float value
- * @valst: - value to be printed
+ * @va_arg_lst: - value to be printed
  */
-void print_float(va_list valst)
+void print_float(va_list va_arg_lst)
 {
-printf("%f", va_arg(valst, double));
+printf("%f", va_arg(va_arg_lst, double));
 }
 /**
  * print_string - prints string value
- * @valst: - value to be printed
+ * @va_arg_lst: - value to be printed
  */
-void print_string(va_list valst)
+void print_string(va_list va_arg_lst)
 {
 char *str;
-str = va_arg(valst, char*);
-if (str)
-printf("%s", str);
-else
+str = va_arg(va_arg_lst, char*);
+if (str == NULL)
+{
 printf("(nil)");
+return;
+}
+printf("%s", str);
 }
