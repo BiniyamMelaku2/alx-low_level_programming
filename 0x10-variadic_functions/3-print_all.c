@@ -12,9 +12,9 @@ void print_string(va_list va_arg_lst);
 void print_all(const char * const format, ...)
 {
 char *sep = "";
-int c = 0, i;
+unsigned int c = 0, i;
 va_list valist;
-opt_formats op_format[] = {
+opt_formats oper_f[] = {
 {"c", print_char},
 {"i", print_int},
 {"f", print_float},
@@ -25,12 +25,12 @@ va_start(valist, format);
 while (format && format[c])
 {
 i = 0;
-while (op_format[i].func)
+while (oper_f[i].func)
 {
-if (*op_format[c].ch == format[i])
+if (*oper_f[i].ch == format[c])
 {
 printf("%s", sep);
-op_format[c].func(valist);
+oper_f[i].func(valist);
 sep = ", ";
 break;
 }
