@@ -1,38 +1,16 @@
-; 100-hello_holberton.asm       print a string using printf
-; Assemble:	  nasm -f elf64 -l 100-hello_holberton.lst  100-hello_holberton.asm
-; Link:		  gcc -m64 -o hello  100-hello_holberton.o
-; Run:		  ./hello > hello.out
-; Output:	  cat hello.out
+section .data		; Data section, initialized variables
+msg: db "Hello, Holberton", 10
+msglen: equ $ - msg
+section .text                 ; Code section.
 
-; Equivalent C code
-; // 100-hello_holberton.c
-; #include <stdio.h>
-; int main()
-; {
-;   char msg[] = "Hello, Holberton\n";
-;   printf("%s\n",msg);
-;   return 0;
-; }
-	
-; Declare needed C  functions
-        extern	printf		; the C function, to be called
+global main		; the standard gcc entry point
+main:			; the program label for the entry point
+ mov rax, 1
+ mov rdi, 1
+ mov rsi, msg
+ mov rdx, msglen		
+ syscall
 
-        section .data		; Data section, initialized variables
-msg:	db "Hello, Holberton", 0	; C string needs 0
-fmt:    db "%s", 10, 0          ; The printf format, "\n",'0'
-
-        section .text           ; Code section.
-
-        global main		; the standard gcc entry point
-main:				; the program label for the entry point
-        push    rbp		; set up stack frame, must be aligned
-	
-	mov	rdi,fmt
-	mov	rsi,msg
-	mov	rax,0		; or can be  xor  rax,rax
-        call    printf		; Call C function
-
-        pop     rbp		; restore stack 
-
-	mov	rax,0		; normal, no error, return value
-	ret			; return
+ mov rax, 60		
+ mov rdi, 0			; return
+ syscall
