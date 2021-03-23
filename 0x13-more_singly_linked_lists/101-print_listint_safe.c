@@ -62,6 +62,7 @@ loop_exist = findloop(head);
 if (loop_exist == 1)
 {
 size = count_nodes_loop(head);
+temp = head;
 for (loop_exist = 0; loop_exist < size; loop_exist++)
 {
 printf("[%p] %d\n", (void *)temp, temp->n);
