@@ -70,6 +70,7 @@ printf("[%p] %d\n", (void *)temp, temp->n);
 nodes += 1;
 temp = temp->next;
 }
+printf("-> [%p] %d\n", (void *)temp, temp->n);
 }
 else if (loop_exist == 0)
 {
