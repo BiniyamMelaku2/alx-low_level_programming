@@ -6,7 +6,8 @@
  */
 int findloop(const listint_t *head)
 {
-const listint_t *start = head, *end = head;
+const listint_t *start, *end;
+start = end = head;
 while (start != NULL && end != NULL)
 {
 start = start->next;
@@ -16,7 +17,6 @@ return (1);
 }
 return (0);
 }
-
 /**
  * count_nodes_loop - count number of nodes in the loop
  * @head: pointer to the listint_t list
@@ -25,7 +25,8 @@ return (0);
 int count_nodes_loop(const listint_t *head)
 {
 int nodes = 0;
-const listint_t *start = head, *end = head;
+const listint_t *start, *end;
+start = end = head;
 while (start != NULL && end != NULL)
 {
 start = start->next;
@@ -62,7 +63,6 @@ loop_exist = findloop(head);
 if (loop_exist == 1)
 {
 size = count_nodes_loop(head);
-temp = head;
 for (loop_exist = 0; loop_exist < size; loop_exist++)
 {
 printf("[%p] %d\n", (void *)temp, temp->n);
