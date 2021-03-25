@@ -8,15 +8,21 @@
 int set_bit(unsigned long int *n, unsigned int index)
 {
 unsigned int count = index;
-if (n == NULL)
+if (n == NULL || index > 64)
+{
 return (-1);
+}
 if (*n == 0)
 {
 *n = 1;
 for (; count; count--)
+{
 *n <<= 1;
 }
+}
 else
+{
 *n |= (1 << index);
+}
 return (1);
 }
