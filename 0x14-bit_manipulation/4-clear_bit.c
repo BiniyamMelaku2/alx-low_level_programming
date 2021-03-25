@@ -11,7 +11,7 @@ unsigned long int num = *n;
 unsigned int count = index;
 for (count = 0; num; count++)
 num >>= 1;
-if (index >= count || n == NULL)
+if (index > 64 || n == NULL)
 return (-1);
 num = 1 << index;
 num = ~num;
