@@ -11,7 +11,7 @@ void log_error_n_quit(char * err, int er_no)
 {
   fprintf(stderr, "prntelf error: ");
   fprintf(stderr, "%s", err);
-  if (er_no) // if errno is true 
+  if (er_no)  
     fprintf(stderr, "%s\n", strerror(er_no));
   else
     fprintf(stderr, "\n");
@@ -65,13 +65,14 @@ char * load_file(const char * file_name)
 
 void print_elf_hdr(Elf64_Ehdr * elf) 
 {
+int i;
   const char * unkown = "Unknown";
   
   printf("ELF Header: \n");
 
   /* magic number(s) [first 4 bytes + 7 unused bytes from the e_ident array at offset/index ] */ 
   printf("Magic:      %02X %c%c%c ", elf->e_ident[0], elf->e_ident[1], elf->e_ident[2], elf->e_ident[3]);
-  for (int i = 0; i < 7; i++) {
+  for (i = 0; i < 7; i++) {
     printf("%02X ", elf->e_ident[EI_PAD + i]);
   }
   printf("\n");
@@ -173,7 +174,7 @@ void print_elf_hdr(Elf64_Ehdr * elf)
   printf("Section Header Table Offset: 0x%lX\n", elf->e_shoff);
   printf("Flags: 0x%02X\n", elf->e_flags);
   printf("ELF Header Size: 0x%02X\n", elf->e_ehsize);
-  printf("Program Header Size: 0x%02X\n", elf->e_phentsize); // each program header corresponds to a segment which will be loaded into memory by the os loader
+  printf("Program Header Size: 0x%02X\n", elf->e_phentsize);
   printf("Number of Program Headers: 0x%02X\n", elf->e_phnum);
   printf("Section Header Size: 0x%02X\n", elf->e_shentsize);  
   printf("Number of Section Headers: 0x%02X\n", elf->e_shnum);
@@ -193,7 +194,7 @@ void print_all_section_names(Elf64_Ehdr * elf, char * f)
 
   /* string table "section" (contains other section names) */
   sctn_name_str_table = (sectn_hdr_tble + (elf->e_shstrndx * elf->e_shentsize));
-  assert(*(uint32_t *)(sctn_name_str_table + 4) == SHT_STRTAB); // sanity check the str table is a string table
+  assert(*(uint32_t *)(sctn_name_str_table + 4) == SHT_STRTAB); 
   str_table = f + (*(Elf64_Off *)(sctn_name_str_table + 24));
 
   /* str tables always start and end with null byte so another sanity check :)*/
@@ -229,7 +230,7 @@ void print_all_section_names(Elf64_Ehdr * elf, char * f)
         printf("String Table\n");
         break;
       default:
-        printf("Unsupported by this utiltiy\n"); // don't feel like typing out all options and this is just for fun
+        printf("Unsupported by this utiltiy\n"); 
         break;
     }
 
@@ -239,15 +240,15 @@ void print_all_section_names(Elf64_Ehdr * elf, char * f)
       printf("W ");
     if (cur_sec.sh_flags & SHF_EXECINSTR)
       printf("X ");
-    if (cur_sec.sh_flags & SHF_ALLOC) // occupies memory only, with no write or execute ascess so R == read only
+    if (cur_sec.sh_flags & SHF_ALLOC)
       printf("R"); 
     if (cur_sec.sh_flags & SHF_MASKPROC)
       printf("Reserved");
-    if (cur_sec.sh_flags == (uint64_t)0) // 0 bits set aka no flags
+    if (cur_sec.sh_flags == (uint64_t)0) 
       printf("0x00");
     printf("\n");
 
-    printf("Memory Addr: 0x%02lX\n", cur_sec.sh_addr); // only if the section is loaded into memory 0 otherwise
+    printf("Memory Addr: 0x%02lX\n", cur_sec.sh_addr); 
     printf("File Offset (bytes): 0x%02lX\n", cur_sec.sh_offset);
     printf("Section Size (bytes): 0x%02lX\n", cur_sec.sh_size);
   }
@@ -256,19 +257,16 @@ void print_all_section_names(Elf64_Ehdr * elf, char * f)
 
 int main(int argc, char ** argv) 
 {
-
+/* retrieve contents of the file */
+char *f = load_file(argv[1]);
+/* map first 64 bytes of file into elf header*/
+Elf64_Ehdr elf_hdr;
   /* Usage Check */
   if (argc < 2) {
     fprintf(stderr, "Usage: %s <filename>\n", *argv);
     return 1;
   }
-
-  /* retreive contents of the file */
-  char * f = load_file(argv[1]);
-
-  /* map first 64 bytes of file into elf header */
-  Elf64_Ehdr elf_hdr;
-  memcpy(&elf_hdr, f, 64);
+memcpy(&elf_hdr, f, 64);
 
   /* print the elf header */
   print_elf_hdr(&elf_hdr);
