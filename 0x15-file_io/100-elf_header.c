@@ -16,14 +16,14 @@ typedef signed int Elf32_Sword;
 typedef unsigned int Elf32_Word;
 
 /* 64-bit ELF base types. */
-typedef unsigned long long Elf64_Addr;
+typedef unsigned long Elf64_Addr;
 typedef unsigned short Elf64_Half;
 typedef signed short Elf64_SHalf;
-typedef unsigned long long Elf64_Off;
+typedef unsigned long Elf64_Off;
 typedef signed int Elf64_Sword;
 typedef unsigned int Elf64_Word;
-typedef unsigned long long Elf64_Xword;
-typedef signed long long Elf64_Sxword;
+typedef unsigned long Elf64_Xword;
+typedef signed long Elf64_Sxword;
 
 typedef struct elf32_hdr{
   unsigned char e_ident[EI_NIDENT];
@@ -105,11 +105,11 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  // read ELF header, first thing in the file
+  /* read ELF header, first thing in the file */
   fread(&elfHdr, 1, sizeof(Elf64_Ehdr), ElfFile);
 
-  // read section name string table
-  // first, read its header. 
+  /* read section name string table
+   * first, read its header. */
   /* 
    e_shoff         This member holds the section header table's file offset
                    in bytes.  If the file has no section header table, this
@@ -194,13 +194,13 @@ int main(int argc, char **argv)
                  is an index into the section header string table section,
                  giving the location of a null-terminated string.
    */
-  // next, read the section, string data
-  // printf("sh_size = %llu\n", sectHdr.sh_size);
+  /* next, read the section, string data
+   * printf("sh_size = %llu\n", sectHdr.sh_size); */
   SectNames = malloc(sectHdr.sh_size);
   fseek(ElfFile, sectHdr.sh_offset, SEEK_SET);
   fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
-  // read all section headers
+  /* read all section headers */
   for (idx = 0; idx < elfHdr.e_shnum; idx++)
   {
     const char* name = "";
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
     fseek(ElfFile, elfHdr.e_shoff + idx * sizeof(sectHdr), SEEK_SET);
     fread(&sectHdr, 1, sizeof(sectHdr), ElfFile);
 
-    // print section name
+    /* print section name */
     if (sectHdr.sh_name)
       name = SectNames + sectHdr.sh_name;
     printf("%2u %s\n", idx, name);
