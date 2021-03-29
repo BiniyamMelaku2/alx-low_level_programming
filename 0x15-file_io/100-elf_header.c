@@ -1,218 +1,284 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+#include <elf.h>
+#include <stdio.h>
+#include <errno.h>
+#include <assert.h>
+#include <stdint.h>
 
-#pragma pack(push,1)
-#pragma pack(pop)
-
-#define EI_NIDENT       16
-
-/* 32-bit ELF base types. */
-typedef unsigned int Elf32_Addr;
-typedef unsigned short Elf32_Half;
-typedef unsigned int Elf32_Off;
-typedef signed int Elf32_Sword;
-typedef unsigned int Elf32_Word;
-
-/* 64-bit ELF base types. */
-typedef unsigned long Elf64_Addr;
-typedef unsigned short Elf64_Half;
-typedef signed short Elf64_SHalf;
-typedef unsigned long Elf64_Off;
-typedef signed int Elf64_Sword;
-typedef unsigned int Elf64_Word;
-typedef unsigned long Elf64_Xword;
-typedef signed long Elf64_Sxword;
-
-typedef struct elf32_hdr{
-  unsigned char e_ident[EI_NIDENT];
-  Elf32_Half    e_type;
-  Elf32_Half    e_machine;
-  Elf32_Word    e_version;
-  Elf32_Addr    e_entry;  /* Entry point */
-  Elf32_Off e_phoff;
-  Elf32_Off e_shoff;
-  Elf32_Word    e_flags;
-  Elf32_Half    e_ehsize;
-  Elf32_Half    e_phentsize;
-  Elf32_Half    e_phnum;
-  Elf32_Half    e_shentsize;
-  Elf32_Half    e_shnum;
-  Elf32_Half    e_shstrndx;
-} Elf32_Ehdr;
-
-typedef struct elf32_shdr {
-  Elf32_Word    sh_name;
-  Elf32_Word    sh_type;
-  Elf32_Word    sh_flags;
-  Elf32_Addr    sh_addr;
-  Elf32_Off sh_offset;
-  Elf32_Word    sh_size;
-  Elf32_Word    sh_link;
-  Elf32_Word    sh_info;
-  Elf32_Word    sh_addralign;
-  Elf32_Word    sh_entsize;
-} Elf32_Shdr;
-
-typedef struct elf64_hdr {
-  unsigned char e_ident[EI_NIDENT]; /* ELF "magic number" */
-  Elf64_Half e_type;
-  Elf64_Half e_machine;
-  Elf64_Word e_version;
-  Elf64_Addr e_entry;       /* Entry point virtual address */
-  Elf64_Off e_phoff;        /* Program header table file offset */
-  Elf64_Off e_shoff;        /* Section header table file offset */
-  Elf64_Word e_flags;
-  Elf64_Half e_ehsize;
-  Elf64_Half e_phentsize;
-  Elf64_Half e_phnum;
-  Elf64_Half e_shentsize;
-  Elf64_Half e_shnum;
-  Elf64_Half e_shstrndx;
-} Elf64_Ehdr;
-
-typedef struct elf64_shdr {
-  Elf64_Word sh_name;       /* Section name, index in string tbl */
-  Elf64_Word sh_type;       /* Type of section */
-  Elf64_Xword sh_flags;     /* Miscellaneous section attributes */
-  Elf64_Addr sh_addr;       /* Section virtual addr at execution */
-  Elf64_Off sh_offset;      /* Section file offset */
-  Elf64_Xword sh_size;      /* Size of section in bytes */
-  Elf64_Word sh_link;       /* Index of another section */
-  Elf64_Word sh_info;       /* Additional section information */
-  Elf64_Xword sh_addralign; /* Section alignment */
-  Elf64_Xword sh_entsize;   /* Entry size if section holds table */
-} Elf64_Shdr;
-
-
-
-int main(int argc, char **argv) 
+/* logs error and quits */
+void log_error_n_quit(char * err, int er_no) 
 {
-  FILE* ElfFile = NULL;
-  char* SectNames = NULL;
-  Elf64_Ehdr elfHdr;
-  Elf64_Shdr sectHdr;
-  uint32_t idx;
+  fprintf(stderr, "prntelf error: ");
+  fprintf(stderr, "%s", err);
+  if (er_no) // if errno is true 
+    fprintf(stderr, "%s\n", strerror(er_no));
+  else
+    fprintf(stderr, "\n");
+  exit(1);
+}
 
-  if(argc != 2) {
-    printf("usage: %s <ELF_FILE>\n", argv[0]);
-    exit(1);
-  }
-
-  if((ElfFile = fopen(argv[1], "r")) == NULL) {
-    perror("[E] Error opening file:");
-    exit(1);
-  }
-
-  /* read ELF header, first thing in the file */
-  fread(&elfHdr, 1, sizeof(Elf64_Ehdr), ElfFile);
-
-  /* read section name string table
-   * first, read its header. */
-  /* 
-   e_shoff         This member holds the section header table's file offset
-                   in bytes.  If the file has no section header table, this
-                   member holds zero.
-
-   e_shstrndx      This member holds the section header table index of the
-               entry associated with the section name string table.  If
-           the file has no section name string table, this member
-           holds the value SHN_UNDEF.
-
-           If the index of section name string table section is
-           larger than or equal to SHN_LORESERVE (0xff00), this
-           member holds SHN_XINDEX (0xffff) and the real index of
-           the section name string table section is held in the
-           sh_link member of the initial entry in section header
-           table.  Otherwise, the sh_link member of the initial
-           entry in section header table contains the value zero.
-
-           SHN_UNDEF     This value marks an undefined, missing,
-                         irrelevant, or otherwise meaningless
-                         section reference.  For example, a symbol
-                         "defined" relative to section number
-                         SHN_UNDEF is an undefined symbol.
-
-           SHN_LORESERVE This value specifies the lower bound of the
-                         range of reserved indices.
-
-           SHN_LOPROC    Values greater than or equal to SHN_HIPROC
-                         are reserved for processor-specific
-                         semantics.
-
-           SHN_HIPROC    Values less than or equal to SHN_LOPROC are
-                         reserved for processor-specific semantics.
-
-           SHN_ABS       This value specifies absolute values for
-                         the corresponding reference.  For example,
-                         symbols defined relative to section number
-                         SHN_ABS have absolute values and are not
-                         affected by relocation.
-
-           SHN_COMMON    Symbols defined relative to this section
-                         are common symbols, such as Fortran COMMON
-                         or unallocated C external variables.
-
-           SHN_HIRESERVE This value specifies the upper bound of the
-                         range of reserved indices between
-                         SHN_LORESERVE and SHN_HIRESERVE, inclusive;
-                         the values do not reference the section
-                         header table.  That is, the section header
-                         table does not contain entries for the
-                         reserved indices.
+char * load_file(const char * file_name) 
+{
+  /* Note: if we wanted to be hackery we could use mmap here 
+    But I think this way is better, also only reason I load whole file into mem, is cause im gonna expan on this program
   */
-  fseek(ElfFile, elfHdr.e_shoff + elfHdr.e_shstrndx * sizeof(sectHdr), SEEK_SET);
-  fread(&sectHdr, 1, sizeof(sectHdr), ElfFile);
-  /*
-   sh_size       This member holds the section's size in bytes.  Unless the
-                 section type is SHT_NOBITS, the section occupies sh_size
-                 bytes in the file.  A section of type SHT_NOBITS may have a
-                 nonzero size, but it occupies no space in the file.
+  
+  /* declare variables */
+  int ret, writ;
+  char * m;
 
-   sh_offset     This member's value holds the byte offset from the
-                 beginning of the file to the first byte in the section.
-                 One section type, SHT_NOBITS, occupies no space in the
-                 file, and its sh_offset member locates the conceptual
-                 placement in the file.
-
-   e_shnum       This member holds the number of entries in the section
-                 header table.  Thus the product of e_shentsize and
-                 e_shnum gives the section header table's size in bytes.
-                 If a file has no section header table, e_shnum holds the
-                 value of zero.
-
-                 If the number of entries in the section header table is
-                 larger than or equal to SHN_LORESERVE (0xff00), e_shnum
-                 holds the value zero and the real number of entries in
-                 the section header table is held in the sh_size member of
-                 the initial entry in section header table.  Otherwise,
-                 the sh_size member of the initial entry in the section
-                 header table holds the value zero.   
-
-   sh_name       This member specifies the name of the section.  Its value
-                 is an index into the section header string table section,
-                 giving the location of a null-terminated string.
-   */
-  /* next, read the section, string data
-   * printf("sh_size = %llu\n", sectHdr.sh_size); */
-  SectNames = malloc(sectHdr.sh_size);
-  fseek(ElfFile, sectHdr.sh_offset, SEEK_SET);
-  fread(SectNames, 1, sectHdr.sh_size, ElfFile);
-
-  /* read all section headers */
-  for (idx = 0; idx < elfHdr.e_shnum; idx++)
-  {
-    const char* name = "";
-
-    fseek(ElfFile, elfHdr.e_shoff + idx * sizeof(sectHdr), SEEK_SET);
-    fread(&sectHdr, 1, sizeof(sectHdr), ElfFile);
-
-    /* print section name */
-    if (sectHdr.sh_name)
-      name = SectNames + sectHdr.sh_name;
-    printf("%2u %s\n", idx, name);
+  /* open The File */
+  FILE * f = fopen(file_name, "rb");
+  if (f == NULL)
+    log_error_n_quit("Failed to open file: ", errno);
+  
+  /* get the size of the file (bytes) */
+  if ( (ret = fseek(f, 0, SEEK_END) ) == -1) 
+    log_error_n_quit("Failed to seek to end: ", errno);
+  if ( (writ = ftell(f) ) == -1)
+    log_error_n_quit("Faild to tell current file position: ", 0);
+  
+  /* allocate memory for the file */
+  m = calloc(sizeof(char), writ);
+  if (m == NULL)
+    log_error_n_quit("Memory Allocation Error", errno);
+  
+  /* seek to beginning of file and check for errors */
+  errno = 0;
+  rewind(f);
+  if (errno) {
+    log_error_n_quit("Error seeking to beginning of file: ", errno);
   }
+  
+  /* Read the file into memory */
+  if ( (ret = fread(m, writ, 1, f)) < writ) {
+    if (ferror(f) != 0)
+      log_error_n_quit("Error reading from file: ", errno);
+    if (feof(f) != 0)
+      log_error_n_quit("Error reading from file: EOF", 0); 
+  }
+  
+  /* return pointer to heap allocated memory */
+  return (char *)m;
+}
+
+void print_elf_hdr(Elf64_Ehdr * elf) 
+{
+  const char * unkown = "Unknown";
+  
+  printf("ELF Header: \n");
+
+  /* magic number(s) [first 4 bytes + 7 unused bytes from the e_ident array at offset/index ] */ 
+  printf("Magic:      %02X %c%c%c ", elf->e_ident[0], elf->e_ident[1], elf->e_ident[2], elf->e_ident[3]);
+  for (int i = 0; i < 7; i++) {
+    printf("%02X ", elf->e_ident[EI_PAD + i]);
+  }
+  printf("\n");
+
+  /* endianess & address size */
+  printf("Class: ");
+  switch (elf->e_ident[EI_CLASS]) {
+    case 1:
+      printf("%25s\n", "ELF32");
+      break;
+    case 2:
+      printf("%25s\n", "ELF64");
+      break;
+    default:
+      printf("%25s &", unkown);
+      break;
+  }
+  printf("Data: ");
+  switch (elf->e_ident[EI_DATA]) {
+    case 1:
+      printf("%25s2's complement, little endian\n", " ");
+      break;
+    case 2:
+      printf("%25s2's complement, big endian\n", " ");
+      break;
+    default:
+      printf("%25s\n", unkown);
+      break;
+  }
+  
+  /* Version (1) */
+  printf("Version: %25X (current)\n", elf->e_ident[EI_VERSION]);
+  
+  /* Abi */
+  printf("OS/ABI: %02X\n", elf->e_ident[EI_OSABI]);
+
+  /* Object file type */
+  printf("Type: ");
+  switch (elf->e_type) {
+    case ET_NONE:
+      printf("%25s\n", unkown);
+      break;
+    case ET_REL:
+      printf("%25sRELO (Relocatable file)\n", " ");
+      break;
+    case ET_EXEC:
+      printf("%25sEXEC (Executable file)\n", " ");
+      break;
+    case ET_DYN:
+      printf("%25sDYN (Shared object file)\n", " ");
+      break;
+    case ET_CORE:
+      printf("%25sCF (Core File)\n", " ");
+      break;
+    default:
+      printf("%25s\n", unkown);
+  }
+  
+
+  /* Cpu architecture 
+  printf("Cpu Architecture: ");
+  switch (elf->e_machine) {
+    case EM_NONE:
+      printf("Unkown");
+      break;
+    case EM_386:
+      printf("Intel x86");
+      break;
+    case EM_PPC:
+      printf("Power PC 32 bit");
+      break;
+    case EM_X86_64:
+      printf("AMD x86_64");
+      break;
+    case EM_IA_64:
+      printf("Intel Titanium");
+      break;
+    default:
+      printf("Not supported by this utility (:");
+  }
+  printf("\n"); */
+/*
+  elf version 
+  printf("ELF version: ");
+  switch (elf->e_version) {
+    case EV_NONE:
+      printf("Invalid Version\n");
+      break;
+    case EV_CURRENT:
+      printf("Current Version\n");
+      break;
+    default:
+      printf("Invalid Version\n");
+  }
+  */
+  /* Generic Data */
+  printf("Entry point address:     0x%lX\n", elf->e_entry);
+  /*printf("Program Header Table Offset: 0x%lX\n", elf->e_phoff);
+  printf("Section Header Table Offset: 0x%lX\n", elf->e_shoff);
+  printf("Flags: 0x%02X\n", elf->e_flags);
+  printf("ELF Header Size: 0x%02X\n", elf->e_ehsize);
+  printf("Program Header Size: 0x%02X\n", elf->e_phentsize); // each program header corresponds to a segment which will be loaded into memory by the os loader
+  printf("Number of Program Headers: 0x%02X\n", elf->e_phnum);
+  printf("Section Header Size: 0x%02X\n", elf->e_shentsize);  
+  printf("Number of Section Headers: 0x%02X\n", elf->e_shnum);
+  printf("Section Names Entry Offset: 0x%02X\n", elf->e_shstrndx); // contains a pointer to the section header which contains the names of the sections
+  */
+}
+
+void print_all_section_names(Elf64_Ehdr * elf, char * f) 
+{
+  /* declare variables */
+  int i;
+  char *sectn_hdr_tble, *sctn_name_str_table, *off, *str_table;
+  Elf64_Shdr cur_sec;
+
+  /* Section header table [0] */
+  sectn_hdr_tble = f + elf->e_shoff;
+
+  /* string table "section" (contains other section names) */
+  sctn_name_str_table = (sectn_hdr_tble + (elf->e_shstrndx * elf->e_shentsize));
+  assert(*(uint32_t *)(sctn_name_str_table + 4) == SHT_STRTAB); // sanity check the str table is a string table
+  str_table = f + (*(Elf64_Off *)(sctn_name_str_table + 24));
+
+  /* str tables always start and end with null byte so another sanity check :)*/
+  assert(*(str_table) == '\0');
+
+  /* print all the names */
+  for (i = 0; i < elf->e_shnum; i++) {
+    printf("---------------------------------\n");
+    
+    /* copy section into struct */
+    off = sectn_hdr_tble + (i * elf->e_shentsize);
+    memcpy(&cur_sec, off, elf->e_shentsize);
+    
+    /* print section name */
+    if (*(char *)(str_table + cur_sec.sh_name) == '\0')
+      printf("Name: 0x%02X (No Name)\n", *(char *)(str_table + cur_sec.sh_name));
+    else 
+      printf("Name: %s\n", (char *)(str_table + cur_sec.sh_name));
+    
+    /* print type */
+    printf("Type: ");
+    switch (cur_sec.sh_type) {
+      case SHT_NULL:
+        printf("NULL\n");
+        break;
+      case SHT_PROGBITS:
+        printf("Program Defined\n");
+        break;
+      case SHT_SYMTAB:
+        printf("Symbol Table\n");
+        break;
+      case SHT_STRTAB:
+        printf("String Table\n");
+        break;
+      default:
+        printf("Unsupported by this utiltiy\n"); // don't feel like typing out all options and this is just for fun
+        break;
+    }
+
+    /* print flags */
+    printf("Flags: ");
+    if (cur_sec.sh_flags & SHF_WRITE)
+      printf("W ");
+    if (cur_sec.sh_flags & SHF_EXECINSTR)
+      printf("X ");
+    if (cur_sec.sh_flags & SHF_ALLOC) // occupies memory only, with no write or execute ascess so R == read only
+      printf("R"); 
+    if (cur_sec.sh_flags & SHF_MASKPROC)
+      printf("Reserved");
+    if (cur_sec.sh_flags == (uint64_t)0) // 0 bits set aka no flags
+      printf("0x00");
+    printf("\n");
+
+    printf("Memory Addr: 0x%02lX\n", cur_sec.sh_addr); // only if the section is loaded into memory 0 otherwise
+    printf("File Offset (bytes): 0x%02lX\n", cur_sec.sh_offset);
+    printf("Section Size (bytes): 0x%02lX\n", cur_sec.sh_size);
+  }
+
+}
+
+int main(int argc, char ** argv) 
+{
+
+  /* Usage Check */
+  if (argc < 2) {
+    fprintf(stderr, "Usage: %s <filename>\n", *argv);
+    return 1;
+  }
+
+  /* retreive contents of the file */
+  char * f = load_file(argv[1]);
+
+  /* map first 64 bytes of file into elf header */
+  Elf64_Ehdr elf_hdr;
+  memcpy(&elf_hdr, f, 64);
+
+  /* print the elf header */
+  print_elf_hdr(&elf_hdr);
+
+ /* printf("------------\n"); */
+
+/*  print_all_section_names(&elf_hdr, f); */
+
+  /* free (f) */
+  free(f);
 
   return 0;
 }
