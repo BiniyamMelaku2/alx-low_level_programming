@@ -26,26 +26,28 @@ if (rem[c] != 127 && rem[c] != 'E' && rem[c] != 'L' && rem[c] != 'F')
 dprintf(STDERR_FILENO, "Error: Not ELF file\n"), exit(98);
 }
 /**
- * print_elf_hdr - prints ELF high level header.
- * @elf: a valid elf header file
+ * print_magic - Prints magic of ELF file.
+ * @magic: ELF magic numbers.
  */
-void print_elf_hdr(Elf64_Ehdr *elf)
+void print_magic(unsigned char *magic)
 {
-unsigned int type =  elf->e_type, c;
-unsigned long int entry = elf->e_entry;
-unsigned char *elf_file = elf->e_ident;
-
+int c;
 printf("ELF Header:\n");
-/*print_magic - Prints magic of ELF file. magic: ELF magic numbers. */
 printf("  Magic:   ");
 for (c = 0; c < EI_NIDENT; c++)
 {
-printf("%02x", elf_file[c]);
+printf("%02x", magic[c]);
 c == EI_NIDENT - 1 ? printf("\n") : printf(" ");
 }
-/*print_class - Printf ELF class. class: ELF file. */
+}
+/**
+ * print_class - Printf ELF class.
+ * @class: ELF file.
+ */
+void print_class(unsigned char *class)
+{
 printf("  Class:                             ");
-switch (elf_file[EI_CLASS])
+switch (class[EI_CLASS])
 {
 case ELFCLASSNONE:
 printf("none\n");
@@ -57,11 +59,17 @@ case ELFCLASS64:
 printf("ELF64\n");
 break;
 default:
-printf("<unknown: %x>\n", elf_file[EI_CLASS]);
+printf("<unknown: %x>\n", class[EI_CLASS]);
 }
-/* print_data - Print ELF data file.*/
+}
+/**
+ * print_data - Print ELF data file.
+ * @data: ELF file.
+ */
+void print_data(unsigned char *data)
+{
 printf("  Data:                              ");
-switch (elf_file[EI_DATA])
+switch (data[EI_DATA])
 {
 case ELFDATANONE:
 printf("none\n");
@@ -73,11 +81,17 @@ case ELFDATA2MSB:
 printf("2's complement, big endian\n");
 break;
 default:
-printf("<unknown: %x>\n", elf_file[EI_CLASS]);
+printf("<unknown: %x>\n", data[EI_CLASS]);
 }
-/* print_version - Prints ELF version file. version: ELF file. */
-printf("  Version:                           %d", elf_file[EI_VERSION]);
-switch (elf_file[EI_VERSION])
+}
+/**
+ * print_version - Prints ELF version file.
+ * @version: ELF file.
+ */
+void print_version(unsigned char *version)
+{
+printf("  Version:                           %d", version[EI_VERSION]);
+switch (version[EI_VERSION])
 {
 case EV_CURRENT:
 printf(" (current)\n");
@@ -86,9 +100,15 @@ default:
 printf("\n");
 break;
 }
-/* print_os_abi - Prints ELF OS/ABI file. */
+}
+/**
+ * print_os_abi - Prints ELF OS/ABI file.
+ * @o_a: ELF file.
+ */
+void print_os_abi(unsigned char *o_a)
+{
 printf("  OS/ABI:                            ");
-switch (elf_file[EI_OSABI])
+switch (o_a[EI_OSABI])
 {
 case ELFOSABI_NONE:
 printf("UNIX - System V\n");
@@ -121,12 +141,25 @@ case ELFOSABI_STANDALONE:
 printf("Standalone App\n");
 break;
 default:
-printf("<unknown: %x>\n", elf_file[EI_OSABI]);
+printf("<unknown: %x>\n", o_a[EI_OSABI]);
 }
-/*print_abi - Prinf ELF ABI version file. abi: ELF file. */
-printf("  ABI Version:                       %d\n", elf_file[EI_ABIVERSION]);
-/* print_type - Print ELF type file. type: ELF type. class: ELF Class */
-if (elf_file[EI_DATA] == ELFDATA2MSB)
+}
+/**
+ * print_abi - Prinf ELF ABI version file.
+ * @abi: ELF file.
+ */
+void print_abi(unsigned char *abi)
+{
+printf("  ABI Version:                       %d\n", abi[EI_ABIVERSION]);
+}
+/**
+ * print_type - Print ELF type file.
+ * @type: ELF type.
+ * @class: ELF Class
+ */
+void print_type(unsigned int type, unsigned char *class)
+{
+if (class[EI_DATA] == ELFDATA2MSB)
 type >>= 8;
 printf("  Type:                              ");
 switch (type)
@@ -149,21 +182,28 @@ break;
 default:
 printf("<unknown: %x>\n", type);
 }
-/*print_entry - Print ELF entry. entry: ELF type. class: ELF Class */
+}
+/**
+ * print_entry - Print ELF entry.
+ * @entry: ELF type.
+ * @class: ELF Class
+ */
+void print_entry(unsigned long int entry, unsigned char *class)
+{
 printf("  Entry point address:               ");
-if (elf_file[EI_DATA] == ELFDATA2MSB)
+if (class[EI_DATA] == ELFDATA2MSB)
 {
 entry = ((entry << 8) & 0xFF00FF00) | ((entry >> 8) & 0xFF00FF);
 entry = (entry << 16) | (entry >> 16);
 }
-if (elf_file[EI_CLASS] == ELFCLASS32)
+if (class[EI_CLASS] == ELFCLASS32)
 printf("%#x\n", (unsigned int)entry);
 else
 printf("%#lx\n", entry);
 }
-
 /**
  * main - Displays the information contained in the ELF header at the
+ *        start of an ELF file.
  * @ac: Number of arguments passed into the program
  * @av: Array of arguments passed.
  * Return: 0 on success.
@@ -190,7 +230,14 @@ printf("Error: Cannot read file %s\n", av[1]);
 free(header), closes_file(openn), exit(98);
 }
 check_file(header->e_ident);
-print_elf_hdr(header);
+print_magic(header->e_ident);
+print_class(header->e_ident);
+print_data(header->e_ident);
+print_version(header->e_ident);
+print_os_abi(header->e_ident);
+print_abi(header->e_ident);
+print_type(header->e_type, header->e_ident);
+print_entry(header->e_entry, header->e_ident);
 free(header);
 closes_file(openn);
 return (0);
