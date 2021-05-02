@@ -15,5 +15,7 @@ if (index == 0)
 break;
 head = head->next;
 }
+if (head == NULL)
+return (NULL);
 return (head);
 }
