@@ -6,9 +6,6 @@
  */
 void free_dlistint(dlistint_t *head)
 {
-if (head == NULL)
-exit(1);
-
 while (head->next)
 {
 head = head->next;
@@ -17,5 +14,4 @@ head->prev = NULL;
 }
 head->prev = NULL;
 free(head);
-exit(0);
 }
