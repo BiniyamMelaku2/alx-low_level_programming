@@ -8,8 +8,6 @@
 size_t print_dlistint(const dlistint_t *h)
 {
 size_t c;
-if (h == NULL)
-exit(1);
 for (c = 0; h; c++)
 {
 printf("%i\n", h->n);
