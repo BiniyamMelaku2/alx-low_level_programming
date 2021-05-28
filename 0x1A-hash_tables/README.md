@@ -92,4 +92,4 @@ For this task, please:
 * [An Introduction to Hash Tables in C](https://medium.com/@bennettbuchanan)
 * [Hash Table Program in C](https://www.tutorialspoint.com/data_structures_algorithms/hash_table_program_in_c.htm)
 * [Python dictionary implementation](https://www.laurentluce.com/posts/python-dictionary-implementation/)
-* [ed–black tree](https://en.wikipedia.org/wiki/Red-black_tree)
+* [Red–black tree](https://en.wikipedia.org/wiki/Red-black_tree)
