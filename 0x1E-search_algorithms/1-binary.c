@@ -11,7 +11,7 @@
 int binary_search(int *array, size_t size, int value)
 {
 size_t c = 0, pivot = 0, index = 0, loop = size;
-if (size == 1 && value != array[0])
+if (size == 0 || !array)
 return (-1);
 while (loop--)
 {
