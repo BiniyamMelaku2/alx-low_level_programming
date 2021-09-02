@@ -79,3 +79,54 @@ Write a function that searches for a value in a sorted array of integers using t
 * You can use the sqrt() function included in <math.h> (don’t forget to compile with -lm)
 * Every time you compare a value in the array to the value you are searching for, you have to print this value (see example)
 > gcc -Wall -Wextra -Werror -pedantic 100-main.c 100-jump.c -lm -o 100-jump | ./100-jump 
+
+## [8. Big O #5](./101-O)
+What is the time complexity (average case) of a jump search in an array of size n, using step = sqrt(n)?
+
+## [9. Interpolation search](./102-interpolation.c)
+Write a function that searches for a value in a sorted array of integers using the [Interpolation search algorithm](https://en.wikipedia.org/wiki/Interpolation_search)
+
+* Prototype : [ int interpolation_search(int *array, size_t size, int value); ]
+* Where array is a pointer to the first element of the array to search in
+* size is the number of elements in array
+* And value is the value to search for
+* Your function must return the first index where value is located
+* You can assume that array will be sorted in ascending order
+* If value is not present in array or if array is NULL, your function must return -1
+* To determine the probe position, you can use : size_t pos = low + (((double)(high - low) / (array[high] - array[low])) * (value - array[low]))
+* Every time you compare a value in the array to the value you are searching, you have to print this value (see example below)
+> gcc -Wall -Wextra -Werror -pedantic 102-main.c 102-interpolation.c -o 102-interpolation | ./102-interpolation
+
+## [10. Exponential search](./)
+Write a function that searches for a value in a sorted array of integers using the [Exponential search algorithm](https://en.wikipedia.org/wiki/Exponential_search)
+
+* Prototype : [ int exponential_search(int *array, size_t size, int value); ]
+* Where array is a pointer to the first element of the array to search in
+* size is the number of elements in array
+* And value is the value to search for
+* Your function must return the first index where value is located
+* You can assume that array will be sorted in ascending order
+* If value is not present in array or if array is NULL, your function must return -1
+* You have to use powers of 2 as exponential ranges to search in your array
+* Every time you compare a value in the array to the value you are searching for, you have to print this value (See example)
+* Once you’ve found the good range, you need to use a binary search:
+* Every time you split the array, you have to print the new array (or subarray) you’re searching in (See example)
+> gcc -Wall -Wextra -Werror -pedantic 103-main.c 103-exponential.c -o 103-exponential | ./103-exponential 
+
+## [11. Advanced binary search](./104-advanced_binary.c)
+You may have noticed that the basic binary search does not necessarily return the index of the first value in the array (if this value appears more than once in the array). In this exercise, you’ll have to solve this problem.
+
+Write a function that searches for a value in a sorted array of integers.
+
+* Prototype : [ int advanced_binary(int *array, size_t size, int value); ]
+* Where array is a pointer to the first element of the array to search in
+* size is the number of elements in array
+* And value is the value to search for
+* Your function must return the index where value is located
+* You can assume that array will be sorted in ascending order
+* If value is not present in array or if array is NULL, your function must return -1
+* Every time you split the array, you have to print the new array (or subarray) you’re searching in (See example)
+* You have to use recursion. You may only use one loop (while, for, do while, etc.) in order to print the array
+> gcc -Wall -Wextra -Werror -pedantic 104-main.c 104-advanced_binary.c -o 104-advanced_binary | ./104-advanced_binary
+
+
